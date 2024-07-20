@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <script src="lib/phaser.min.js"></script>
+    <script>
+        class WhaleBounce extends Phaser.Scene
+        {
+            preload ()
+            {
+                this.load.image('whale', 'img/whale300.png');
+                this.load.image('whaletile', 'img/waves-tiled.png');
+                this.load.image('blueparticles', 'https://labs.phaser.io/assets/particles/blue.png');
+            }
+    
+            create ()
+            {
+                this.cameras.main.setBackgroundColor(0xBDEDFF);
+                this.physics.world.setBounds(0, 120, config.width, config.height - 120);
+
+                this.add.graphics()
+                    .fillStyle(0x1589C6, 1) 
+                    .fillRect(0, 400, config.width, 400); 
+                
+                const wave = this.add.tileSprite(config.width/2, 300, config.width, 300, 'whaletile');
+                wave.tilePositionX = config.width;
+                this.tweens.add({
+                    targets: wave,
+                    tilePositionX: 0,
+                    duration: 10000,
+                    ease: 'Linear',
+                    loop: -1
+                });
+    
+                const particles = this.add.particles(0, 0, 'blueparticles', {
+                    speed: 100,
+                    scale: { start: 1, end: 0 },
+                    blendMode: 'ADD'
+                });
+    
+                const whale = this.physics.add.image(config.width/2, 300, 'whale');
+                whale.setScale(0.4);
+
+                whale.setVelocity(-100, 200);
+
+                whale.body.onWorldBounds = true;
+
+                this.physics.world.on('worldbounds', function(body) {
+                    if (body.gameObject === whale) {
+                        if (whale.body.velocity.x > 0) {
+                            whale.setFlipX(true);
+                        } else {
+                            whale.setFlipX(false);
+                        }
+                    }
+                });
+
+                whale.setBounce(1, 1);
+                whale.setCollideWorldBounds(true);
+
+                particles.startFollow(whale);
+            }
+        }
+    
+        const config = {
+            type: Phaser.AUTO,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            // width: 800,
+            // height: 600,
+            scene: WhaleBounce,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 200 }
+                }
+            }
+        };
+    
+        const game = new Phaser.Game(config);
+    </script>
+</body>
+</html>
