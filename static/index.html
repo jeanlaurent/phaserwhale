@@ -20,27 +20,29 @@
             {
                 this.load.image('whale', 'img/whale300.png');
                 this.load.image('whaletile', 'img/waves-tiled.png');
-                this.load.image('blueparticles', 'https://labs.phaser.io/assets/particles/blue.png');
+                this.load.image('blueparticles', 'img/blue-particles.png');
             }
     
             create ()
             {
                 this.cameras.main.setBackgroundColor(0xBDEDFF);
                 this.physics.world.setBounds(0, 120, config.width, config.height - 120);
-
-                this.add.graphics()
-                    .fillStyle(0x1589C6, 1) 
-                    .fillRect(0, 400, config.width, 400); 
-                
+        
                 const wave = this.add.tileSprite(config.width/2, 300, config.width, 300, 'whaletile');
-                wave.tilePositionX = config.width;
+                wave.tilePositionX = 0;  // Start from 0
+                const actualSpriteWidth = 201;  // The actual width of the sprite image
                 this.tweens.add({
                     targets: wave,
-                    tilePositionX: 0,
-                    duration: 10000,
+                    tilePositionX: { from: 0, to: -actualSpriteWidth },  // Move by the actual sprite width
+                    duration: 5000,  // Adjusted duration for smoother animation
                     ease: 'Linear',
-                    loop: -1
+                    repeat: -1,
+                    repeatDelay: 0
                 });
+
+                this.add.graphics()
+                    .fillGradientStyle(0x1589C6, 0x1589C6, 0x12709E, 0x12709E, 1)
+                    .fillRect(0, 420, config.width, config.height - 420);
     
                 const particles = this.add.particles(0, 0, 'blueparticles', {
                     speed: 100,
